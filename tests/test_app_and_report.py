@@ -33,3 +33,24 @@ def test_streamlit_app_renders_without_exceptions():
     at = AppTest.from_file(str(root / "app.py"), default_timeout=300).run()
     assert not at.exception
     assert len(at.tabs) == 4
+
+
+def test_streamlit_app_survives_edge_case_inputs():
+    """0 conversions in A, an impossible baseline x MDE, invalid bandit rates, more history days
+    than the DB holds: every case shows a message instead of crashing."""
+    pytest.importorskip("streamlit")
+    from streamlit.testing.v1 import AppTest
+
+    root = Path(__file__).resolve().parent.parent
+    if not (root / "data" / "sem.duckdb").exists():
+        pytest.skip("run `python -m src.data_generator` first")
+    at = AppTest.from_file(str(root / "app.py"), default_timeout=300).run()
+    at.number_input[1].set_value(0)            # Conversions A = 0
+    at.number_input[4].set_value(0.9)          # baseline 90% ...
+    at.number_input[5].set_value(1.0)          # ... + 100% relative MDE = 180%
+    at.text_input[0].set_value("0.5, abc")     # invalid bandit rates
+    at.run()
+    assert not at.exception
+    assert any(m.value == "n/a" for m in at.metric)
+    errors = " ".join(e.value for e in at.error)
+    assert "below 100%" in errors and "comma-separated rates" in errors

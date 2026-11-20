@@ -20,17 +20,27 @@ def list_queries() -> list[str]:
 
 
 def load_sql(name: str) -> str:
-    path = SQL_DIR / (name if name.endswith(".sql") else f"{name}.sql")
-    return path.read_text(encoding="utf-8")
+    """Read one of the bundled queries. Only names from ``list_queries()`` are
+    accepted, so a caller can never point this at an arbitrary file
+    (e.g. ``../../etc/passwd``) or run SQL that is not in the repository."""
+    stem = name[:-4] if name.endswith(".sql") else name
+    if stem not in list_queries():
+        raise ValueError(f"unknown query {name!r}; available: {', '.join(list_queries())}")
+    return (SQL_DIR / f"{stem}.sql").read_text(encoding="utf-8")
 
 
 def connect(path: str | Path, read_only: bool = True):
-    """DuckDB for *.duckdb, sqlite3 for *.sqlite / *.db."""
+    """DuckDB for *.duckdb, sqlite3 for *.sqlite / *.db. Read-only by default
+    for both engines (analytics never writes)."""
     path = Path(path)
     if path.suffix == ".duckdb":
         import duckdb
 
         return duckdb.connect(str(path), read_only=read_only)
+    if read_only:
+        if not path.exists():  # sqlite3 would otherwise silently create an empty file
+            raise FileNotFoundError(path)
+        return sqlite3.connect(f"{path.resolve().as_uri()}?mode=ro", uri=True)
     return sqlite3.connect(path)
 
 

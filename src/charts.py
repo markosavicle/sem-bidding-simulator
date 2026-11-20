@@ -127,13 +127,17 @@ def posterior_plot(posterior_a: tuple[float, float], posterior_b: tuple[float, f
 
 def lift_distribution(posterior_a, posterior_b, draws: int = 100_000, seed: int = 0) -> go.Figure:
     rng = np.random.default_rng(seed)
-    lift = rng.beta(*posterior_b, draws) / rng.beta(*posterior_a, draws) - 1
+    lift = rng.beta(*posterior_b, draws) / np.maximum(rng.beta(*posterior_a, draws), np.finfo(float).tiny) - 1
+    p_b = (lift > 0).mean()
+    # the ratio is heavy-tailed when A has few conversions: plot the central 99%
+    lo, hi = np.quantile(lift, [0.005, 0.995])
+    lift = lift[(lift >= lo) & (lift <= hi)]
     fig = go.Figure(go.Histogram(x=lift, nbinsx=80, marker={"color": SERIES[0]},
                                  hovertemplate="lift %{x:.1%}<br>%{y} draws<extra></extra>"))
     fig.add_vline(x=0, line={"color": MUTED, "width": 1, "dash": "dot"})
     fig.update_xaxes(title="Relative lift of B over A", tickformat=".0%")
     fig.update_yaxes(title="Posterior draws")
-    return _layout(fig, f"Posterior of relative lift - P(B > A) = {(lift > 0).mean():.1%}", bargap=0.02)
+    return _layout(fig, f"Posterior of relative lift - P(B > A) = {p_b:.1%}", bargap=0.02)
 
 
 # ----------------------------------------------------------------- bandits
