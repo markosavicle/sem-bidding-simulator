@@ -1,0 +1,54 @@
+waste_rank,campaign_name,keyword_text,match_type,search_term,waste_flag,clicks,cost,conversions,term_cpa,campaign_cpa,wasted_cost,cumulative_waste_share
+1,Generic - Laptops,laptop for programming,broad,how to fix laptop for programming,ZERO_CONV,1657.0,2073.26,0.0,,90.54,2073.26,0.1147
+2,Generic - Phones,dual sim phone,phrase,dual sim phone driver download,ZERO_CONV,1129.0,1260.15,0.0,,47.98,1260.15,0.1843
+3,Generic - Phones,compact phone,phrase,how to fix compact phone,HIGH_CPA,1060.0,1078.69,1.0,1078.69,47.98,1030.71,0.2414
+4,Generic - Phones,dual sim phone,phrase,dual sim phone manual pdf,HIGH_CPA,954.0,1061.36,1.0,1061.36,47.98,1013.38,0.2974
+5,Generic - Laptops,laptop for programming,broad,laptop for programming wallpaper,ZERO_CONV,761.0,949.48,0.0,,90.54,949.48,0.3499
+6,Generic - Laptops,laptop for programming,broad,cheap laptop for programming,HIGH_CPA,864.0,1076.92,2.0,538.46,90.54,895.84,0.3994
+7,Generic - Laptops,ultrabook,broad,ultrabook jobs,ZERO_CONV,573.0,783.9,0.0,,90.54,783.9,0.4428
+8,Generic - Phones,phone 256gb,broad,phone 256gb jobs,HIGH_CPA,877.0,706.13,1.0,706.13,47.98,658.15,0.4792
+9,Generic - Laptops,laptop deals,phrase,how to fix laptop deals,ZERO_CONV,474.0,552.67,0.0,,90.54,552.67,0.5098
+10,Generic - Laptops,ultrabook,broad,ultrabook manual pdf,ZERO_CONV,387.0,532.77,0.0,,90.54,532.77,0.5392
+11,Generic - Laptops,lightweight laptop,broad,free lightweight laptop,HIGH_CPA,534.0,566.39,1.0,566.39,90.54,475.85,0.5655
+12,Generic - Laptops,lightweight laptop,broad,lightweight laptop jobs,ZERO_CONV,443.0,475.81,0.0,,90.54,475.81,0.5919
+13,Brand,techhub laptops,broad,techhub laptops driver download,HIGH_CPA,3741.0,473.42,6.0,78.9,2.51,458.37,0.6172
+14,Generic - Phones,5g smartphone,phrase,free 5g smartphone,HIGH_CPA,495.0,541.89,2.0,270.95,47.98,445.92,0.6419
+15,Generic - Phones,phone with best camera,broad,phone with best camera jobs,ZERO_CONV,356.0,414.34,0.0,,47.98,414.34,0.6648
+16,Generic - Phones,dual sim phone,phrase,buy dual sim phone,HIGH_CPA,540.0,600.96,4.0,150.24,47.98,409.03,0.6874
+17,Generic - Phones,phone with best camera,broad,phone with best camera repair,ZERO_CONV,339.0,393.82,0.0,,47.98,393.82,0.7092
+18,Generic - Laptops,ultrabook,broad,used ultrabook forum,HIGH_CPA,353.0,481.98,1.0,481.98,90.54,391.44,0.7308
+19,Generic - Laptops,macbook alternative,phrase,used macbook alternative forum,HIGH_CPA,313.0,463.78,1.0,463.78,90.54,373.24,0.7515
+20,Generic - Laptops,business laptop,phrase,business laptop jobs,ZERO_CONV,263.0,344.88,0.0,,90.54,344.88,0.7705
+21,Brand,techhub laptops,broad,techhub laptops repair,HIGH_CPA,2257.0,286.04,3.0,95.35,2.51,278.52,0.7859
+22,Generic - Phones,5g smartphone,phrase,5g smartphone driver download,HIGH_CPA,294.0,323.24,1.0,323.24,47.98,275.26,0.8012
+23,Generic - Laptops,laptop deals,phrase,laptop deals jobs,ZERO_CONV,217.0,256.41,0.0,,90.54,256.41,0.8154
+24,Generic - Phones,rugged phone,broad,used rugged phone forum,HIGH_CPA,405.0,326.82,2.0,163.41,47.98,230.85,0.8281
+25,Generic - Laptops,business laptop,phrase,business laptop deals,ZERO_CONV,138.0,184.16,0.0,,90.54,184.16,0.8383
+26,Generic - Laptops,laptop i7,broad,free laptop i7,ZERO_CONV,159.0,170.72,0.0,,90.54,170.72,0.8477
+27,Generic - Laptops,student laptop,phrase,how to fix student laptop,ZERO_CONV,170.0,170.46,0.0,,90.54,170.46,0.8572
+28,Brand,techhub coupon,phrase,techhub coupon wallpaper,HIGH_CPA,1734.0,180.42,4.0,45.11,2.51,170.39,0.8666
+29,Generic - Laptops,student laptop,phrase,best student laptop,ZERO_CONV,165.0,167.88,0.0,,90.54,167.88,0.8759
+30,Brand,techhub laptops,broad,techhub laptops wallpaper,HIGH_CPA,1400.0,178.1,5.0,35.62,2.51,165.56,0.885
+31,Competitor,phonezone shop,broad,phonezone shop jobs,ZERO_CONV,115.0,159.73,0.0,,209.32,159.73,0.8939
+32,Generic - Laptops,business laptop,phrase,free business laptop,ZERO_CONV,118.0,155.83,0.0,,90.54,155.83,0.9025
+33,Generic - Phones,rugged phone,broad,rugged phone repair,ZERO_CONV,176.0,141.84,0.0,,47.98,141.84,0.9103
+34,Generic - Phones,refurbished phone,broad,used refurbished phone forum,ZERO_CONV,107.0,138.93,0.0,,47.98,138.93,0.918
+35,Generic - Laptops,laptop i7,broad,laptop i7 wallpaper,ZERO_CONV,129.0,135.82,0.0,,90.54,135.82,0.9255
+36,Generic - Phones,refurbished phone,broad,how to fix refurbished phone,ZERO_CONV,93.0,119.3,0.0,,47.98,119.3,0.9321
+37,Accessories,mechanical keyboard,phrase,mechanical keyboard wallpaper,HIGH_CPA,603.0,118.75,2.0,59.38,6.55,105.65,0.938
+38,Generic - Phones,refurbished phone,broad,cheap refurbished phone,ZERO_CONV,80.0,99.72,0.0,,47.98,99.72,0.9435
+39,Brand,techhub shop,phrase,techhub shop repair,HIGH_CPA,973.0,110.29,5.0,22.06,2.51,97.75,0.9489
+40,Generic - Laptops,student laptop,phrase,student laptop manual pdf,ZERO_CONV,97.0,96.87,0.0,,90.54,96.87,0.9542
+41,Generic - Phones,refurbished phone,broad,refurbished phone manual pdf,ZERO_CONV,78.0,96.09,0.0,,47.98,96.09,0.9596
+42,Competitor,phonezone shop,broad,phonezone shop price,ZERO_CONV,67.0,89.71,0.0,,209.32,89.71,0.9645
+43,Brand,techhub shop,phrase,used techhub shop forum,HIGH_CPA,795.0,90.03,1.0,90.03,2.51,87.52,0.9694
+44,Brand,techhub coupon,phrase,techhub coupon driver download,HIGH_CPA,853.0,88.8,2.0,44.4,2.51,83.78,0.974
+45,Generic - Phones,phone 120hz,exact,phone 120hz,ZERO_CONV,105.0,79.81,0.0,,47.98,79.81,0.9784
+46,Competitor,phonezone shop,broad,phonezone shop driver download,ZERO_CONV,48.0,68.21,0.0,,209.32,68.21,0.9822
+47,Accessories,wireless mouse,broad,wireless mouse jobs,HIGH_CPA,344.0,70.44,1.0,70.44,6.55,63.89,0.9857
+48,Generic - Laptops,oled laptop,phrase,free oled laptop,ZERO_CONV,58.0,61.8,0.0,,90.54,61.8,0.9891
+49,Accessories,wireless mouse,broad,how to fix wireless mouse,ZERO_CONV,280.0,56.48,0.0,,6.55,56.48,0.9923
+50,Competitor,bigbox electronics,exact,bigbox electronics,ZERO_CONV,63.0,52.86,0.0,,209.32,52.86,0.9952
+51,Competitor,eshop tech outlet,exact,eshop tech outlet,ZERO_CONV,28.0,29.56,0.0,,209.32,29.56,0.9968
+52,Accessories,power bank,broad,power bank repair,ZERO_CONV,169.0,29.43,0.0,,6.55,29.43,0.9984
+53,Accessories,power bank,broad,power bank jobs,ZERO_CONV,163.0,28.2,0.0,,6.55,28.2,1.0

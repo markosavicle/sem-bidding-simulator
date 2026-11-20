@@ -1,0 +1,399 @@
+{
+  "generated_at": "2026-11-19T20:30:49+00:00",
+  "note": "All data are synthetic (simulated world). Numbers are not client results.",
+  "data": {
+    "meta": {
+      "seed": 42,
+      "start_date": "2025-08-04",
+      "n_days": 120,
+      "keyword_scale": 1.0,
+      "generator_version": "1.0"
+    },
+    "keyword_days": 5640,
+    "keywords": 47,
+    "date_from": "2025-08-04",
+    "date_to": "2025-12-01"
+  },
+  "sql": {
+    "campaign_kpis": [
+      {
+        "campaign_name": "Generic - Laptops",
+        "impressions": 954150.0,
+        "clicks": 29590.0,
+        "cost": 36849.23,
+        "conversions": 407.0,
+        "conv_value": 206511.03,
+        "ctr": 0.031,
+        "cpc": 1.245,
+        "cvr": 0.0138,
+        "cpa": 90.54,
+        "roas": 5.6,
+        "share_of_spend": 0.4849
+      },
+      {
+        "campaign_name": "Generic - Phones",
+        "impressions": 714694.0,
+        "clicks": 30066.0,
+        "cost": 30133.56,
+        "conversions": 628.0,
+        "conv_value": 175156.02,
+        "ctr": 0.0421,
+        "cpc": 1.002,
+        "cvr": 0.0209,
+        "cpa": 47.98,
+        "roas": 5.81,
+        "share_of_spend": 0.3966
+      },
+      {
+        "campaign_name": "Brand",
+        "impressions": 268231.0,
+        "clicks": 35387.0,
+        "cost": 4218.41,
+        "conversions": 1682.0,
+        "conv_value": 245695.98,
+        "ctr": 0.1319,
+        "cpc": 0.119,
+        "cvr": 0.0475,
+        "cpa": 2.51,
+        "roas": 58.24,
+        "share_of_spend": 0.0555
+      },
+      {
+        "campaign_name": "Accessories",
+        "impressions": 532168.0,
+        "clicks": 21226.0,
+        "cost": 3948.85,
+        "conversions": 603.0,
+        "conv_value": 18078.31,
+        "ctr": 0.0399,
+        "cpc": 0.186,
+        "cvr": 0.0284,
+        "cpa": 6.55,
+        "roas": 4.58,
+        "share_of_spend": 0.052
+      },
+      {
+        "campaign_name": "Competitor",
+        "impressions": 190440.0,
+        "clicks": 635.0,
+        "cost": 837.39,
+        "conversions": 4.0,
+        "conv_value": 1135.02,
+        "ctr": 0.0033,
+        "cpc": 1.319,
+        "cvr": 0.0063,
+        "cpa": 209.35,
+        "roas": 1.36,
+        "share_of_spend": 0.011
+      }
+    ],
+    "wasted_spend_eur": 18082.000000000004,
+    "wasted_spend_share": 0.23796037871521925,
+    "wasted_terms": 53,
+    "top_waste_terms": [
+      {
+        "search_term": "how to fix laptop for programming",
+        "waste_flag": "ZERO_CONV",
+        "cost": 2073.26,
+        "conversions": 0.0,
+        "wasted_cost": 2073.26
+      },
+      {
+        "search_term": "dual sim phone driver download",
+        "waste_flag": "ZERO_CONV",
+        "cost": 1260.15,
+        "conversions": 0.0,
+        "wasted_cost": 1260.15
+      },
+      {
+        "search_term": "how to fix compact phone",
+        "waste_flag": "HIGH_CPA",
+        "cost": 1078.69,
+        "conversions": 1.0,
+        "wasted_cost": 1030.71
+      },
+      {
+        "search_term": "dual sim phone manual pdf",
+        "waste_flag": "HIGH_CPA",
+        "cost": 1061.36,
+        "conversions": 1.0,
+        "wasted_cost": 1013.38
+      },
+      {
+        "search_term": "laptop for programming wallpaper",
+        "waste_flag": "ZERO_CONV",
+        "cost": 949.48,
+        "conversions": 0.0,
+        "wasted_cost": 949.48
+      }
+    ]
+  },
+  "ab_test": {
+    "data": {
+      "clicks_a": 1574,
+      "imps_a": 40000,
+      "clicks_b": 1827,
+      "imps_b": 40000
+    },
+    "true_ctr": [
+      0.04,
+      0.044
+    ],
+    "frequentist": {
+      "rate_a": 0.03935,
+      "rate_b": 0.045675,
+      "abs_lift": 0.006324999999999997,
+      "rel_lift": 0.16073697585768734,
+      "z": 4.4335401801387535,
+      "p_value": 9.269822190095709e-06,
+      "ci_low": 0.003529209584219543,
+      "ci_high": 0.009120790415780452,
+      "alpha": 0.05,
+      "significant": true,
+      "power": 0.9933172734481004
+    },
+    "bayesian": {
+      "posterior_a": [
+        1575.0,
+        38427.0
+      ],
+      "posterior_b": [
+        1828.0,
+        38174.0
+      ],
+      "mean_a": 0.03937303134843258,
+      "mean_b": 0.04569771511424429,
+      "ci_a": [
+        0.03748914171403448,
+        0.04130054552427895
+      ],
+      "ci_b": [
+        0.04367291664136334,
+        0.04776553940897049
+      ],
+      "prob_b_beats_a": 0.9999953916604739,
+      "expected_loss_choose_b": 1.0481868080985251e-09,
+      "expected_loss_choose_a": 0.006326974676129054,
+      "rel_lift_mean": 0.16139559543996743,
+      "rel_lift_ci": [
+        0.08682933761810126,
+        0.23991731868124808
+      ]
+    },
+    "required_n_per_arm": 39475,
+    "srm": {
+      "chi2": 0.0,
+      "p_value": 1.0,
+      "srm_detected": false
+    }
+  },
+  "bandits": {
+    "true_rates": [
+      0.03,
+      0.034,
+      0.04
+    ],
+    "rounds": 20000,
+    "sims": 200,
+    "table": [
+      {
+        "policy": "static_split",
+        "final_cum_regret": 106.67200000001289,
+        "total_revenue": 41554.5,
+        "revenue_sd": 1570.44171682035,
+        "revenue_lift_vs_static": 0.0,
+        "best_arm_share": 0.3333000000000006,
+        "arm_share": [
+          0.3334,
+          0.3334,
+          0.3333
+        ]
+      },
+      {
+        "policy": "thompson",
+        "final_cum_regret": 38.55606000000116,
+        "total_revenue": 45877.8,
+        "revenue_sd": 2209.314034380935,
+        "revenue_lift_vs_static": 0.10403927372486743,
+        "best_arm_share": 0.7370554999999996,
+        "arm_share": [
+          0.0875,
+          0.1754,
+          0.7371
+        ]
+      },
+      {
+        "policy": "ucb1",
+        "final_cum_regret": 94.48031000000793,
+        "total_revenue": 42254.7,
+        "revenue_sd": 1628.2869840763829,
+        "revenue_lift_vs_static": 0.016850160632422506,
+        "best_arm_share": 0.3993087499999999,
+        "arm_share": [
+          0.28,
+          0.3207,
+          0.3993
+        ]
+      }
+    ]
+  },
+  "bidding": {
+    "target_roas": 2.857142857142857,
+    "margin": 0.35,
+    "forward_weeks": 4,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "summary": [
+      {
+        "strategy": "static_bids",
+        "cost": 17975.56532153045,
+        "conversions": 757.6,
+        "conv_value": 160088.85298327904,
+        "roas": 8.90701229114082,
+        "roas_sd": 0.5403085540066151,
+        "cpa": 23.784652754109334,
+        "profit": 38055.53322261721,
+        "profit_sd": 3319.4398152761846,
+        "clicks": 26868.4
+      },
+      {
+        "strategy": "rule_based",
+        "cost": 22837.931819988717,
+        "conversions": 895.6,
+        "conv_value": 176760.5650304242,
+        "roas": 7.740518203589893,
+        "roas_sd": 0.29179601343996653,
+        "cpa": 25.503401123718675,
+        "profit": 39028.265940659745,
+        "profit_sd": 2581.3029340739645,
+        "clicks": 31185.8
+      },
+      {
+        "strategy": "ev_raw_cvr",
+        "cost": 18521.703611058656,
+        "conversions": 971.4,
+        "conv_value": 186806.5985208109,
+        "roas": 10.083287035159051,
+        "roas_sd": 0.37650827475618104,
+        "cpa": 19.086381916215593,
+        "profit": 46860.60587122516,
+        "profit_sd": 2940.7540393942177,
+        "clicks": 29229.4
+      },
+      {
+        "strategy": "ev_shrinkage",
+        "cost": 18655.844743170368,
+        "conversions": 977.0,
+        "conv_value": 187313.73384839162,
+        "roas": 10.039822924971084,
+        "roas_sd": 0.504722982582097,
+        "cpa": 19.109420609017093,
+        "profit": 46903.962103766695,
+        "profit_sd": 3414.51221930267,
+        "clicks": 29553.2
+      },
+      {
+        "strategy": "oracle_true_value",
+        "cost": 18535.091048722636,
+        "conversions": 980.2,
+        "conv_value": 189855.15637667174,
+        "roas": 10.24241345177876,
+        "roas_sd": 0.3660363772531217,
+        "cpa": 18.911914723325587,
+        "profit": 47914.213683112466,
+        "profit_sd": 2503.2683904279015,
+        "clicks": 29155.0
+      }
+    ],
+    "paired_ev_shrinkage_vs_rules": {
+      "roas_diff_mean": 2.29930472138119,
+      "roas_diff_min": 1.573634923507651,
+      "profit_diff_mean": 7875.696163106948,
+      "profit_diff_min": 1668.74903909344,
+      "seeds_ev_wins_profit": 5,
+      "n_seeds": 5
+    },
+    "cvr_estimation_error_full_history": [
+      {
+        "volume_bucket": "0-300 clicks",
+        "keywords": 6,
+        "mae_raw": 0.0071241069965415705,
+        "mae_shrunk": 0.0027970034179603943,
+        "mean_true_cvr": 0.00848855785759955,
+        "error_reduction": 0.6073889093302203
+      },
+      {
+        "volume_bucket": "300-1000 clicks",
+        "keywords": 12,
+        "mae_raw": 0.003456407020652892,
+        "mae_shrunk": 0.003067302112819891,
+        "mean_true_cvr": 0.023436723567915128,
+        "error_reduction": 0.11257496744683204
+      },
+      {
+        "volume_bucket": "1000-5000 clicks",
+        "keywords": 21,
+        "mae_raw": 0.0021889536913933046,
+        "mae_shrunk": 0.0020676957560609235,
+        "mean_true_cvr": 0.02031901872098015,
+        "error_reduction": 0.05539538630221019
+      },
+      {
+        "volume_bucket": "5000-inf clicks",
+        "keywords": 8,
+        "mae_raw": 0.0019033260848909837,
+        "mae_shrunk": 0.001783290905885979,
+        "mean_true_cvr": 0.029525135237889726,
+        "error_reduction": 0.06306600847740707
+      },
+      {
+        "volume_bucket": "all keywords",
+        "keywords": 47,
+        "mae_raw": 0.0030939609026696055,
+        "mae_shrunk": 0.0023676081699142183,
+        "mean_true_cvr": 0.02117175542562297,
+        "error_reduction": 0.2347646772551838
+      }
+    ],
+    "cvr_estimation_error_last_28d": [
+      {
+        "volume_bucket": "0-300 clicks",
+        "keywords": 24,
+        "mae_raw": 0.009553856478530078,
+        "mae_shrunk": 0.005599241743622748,
+        "mean_true_cvr": 0.017233389244198778,
+        "error_reduction": 0.4139286312071304
+      },
+      {
+        "volume_bucket": "300-1000 clicks",
+        "keywords": 13,
+        "mae_raw": 0.004365688478755179,
+        "mae_shrunk": 0.005269493904657797,
+        "mean_true_cvr": 0.02334912791646691,
+        "error_reduction": -0.20702471793414046
+      },
+      {
+        "volume_bucket": "1000-5000 clicks",
+        "keywords": 10,
+        "mae_raw": 0.005055735142590603,
+        "mae_shrunk": 0.004923804648174873,
+        "mean_true_cvr": 0.027793250022943923,
+        "error_reduction": 0.02609521477980903
+      },
+      {
+        "volume_bucket": "all keywords",
+        "keywords": 47,
+        "mae_raw": 0.007161784194349899,
+        "mae_shrunk": 0.005364324874239278,
+        "mean_true_cvr": 0.02117175542562297,
+        "error_reduction": 0.25097926317420716
+      }
+    ]
+  },
+  "runtime_seconds": 7.7
+}

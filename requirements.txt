@@ -1,0 +1,7 @@
+numpy>=2.0
+scipy>=1.13
+pandas>=2.2
+duckdb>=1.1
+plotly>=5.24
+streamlit>=1.40   # optional: dashboard (python -m src.pipeline --report works without it)
+pytest>=8.0
