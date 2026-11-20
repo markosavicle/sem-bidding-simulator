@@ -30,6 +30,19 @@ DB = ROOT / "data" / "sem.duckdb"
 
 st.set_page_config(page_title="SEM Bidding Simulator", layout="wide")
 
+# The app is public (sem.savicdev.com, mem_limit 1536m). Every distinct widget combination is a new
+# cache entry, so all caches are bounded: without max_entries a few curious visitors can grow the
+# process until the container is OOM-killed.
+CACHE = {"max_entries": 32, "ttl": 3600}
+
+
+def ratio(num: float, den: float) -> float:
+    return num / den if den else float("nan")
+
+
+def pct(x: float, fmt: str = "+.2%") -> str:
+    return "n/a" if not np.isfinite(x) else format(x, fmt)
+
 
 @st.cache_resource(show_spinner="Generating synthetic SEM data ...")
 def ensure_db(seed: int) -> str:
@@ -38,7 +51,7 @@ def ensure_db(seed: int) -> str:
     return str(DB)
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, max_entries=64)
 def query(name: str, db: str) -> pd.DataFrame:
     con = connect(db)
     try:
@@ -47,7 +60,7 @@ def query(name: str, db: str) -> pd.DataFrame:
         con.close()
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, max_entries=2)
 def history(db: str) -> tuple[pd.DataFrame, dict]:
     con = connect(db)
     try:
@@ -56,15 +69,16 @@ def history(db: str) -> tuple[pd.DataFrame, dict]:
         con.close()
 
 
-@st.cache_data(show_spinner="Running bandit simulation ...")
+@st.cache_data(show_spinner="Running bandit simulation ...", **CACHE)
 def bandits(rates: tuple[float, ...], rounds: int, sims: int, value: float):
     return se.simulate_bandits(list(rates), n_rounds=rounds, n_sims=sims, value_per_conversion=value)
 
 
-@st.cache_data(show_spinner="Simulating 4 weeks of bidding per strategy ...")
+@st.cache_data(show_spinner="Simulating the bidding strategies ...", **CACHE)
 def bidding(db: str, target_roas: float, margin: float, weeks: int, n_seeds: int, history_days: int):
     hist, meta = history(db)
-    hist = hist[hist.date >= sorted(hist.date.unique())[-history_days]]
+    days = sorted(hist.date.unique())
+    hist = hist[hist.date >= days[-min(history_days, len(days))]]  # the DB may hold fewer days
     world = dg.SemWorld.build(seed=int(meta["seed"]), keyword_scale=float(meta["keyword_scale"]))
     sim = bo.compare_strategies(world, hist, bo.default_strategies(world, target_roas), target_roas=target_roas,
                                 n_weeks=weeks, seeds=tuple(range(n_seeds)), margin=margin)
@@ -87,9 +101,9 @@ with tab_sql:
     c = st.columns(4)
     c[0].metric("Spend", f"{kpi.cost.sum():,.0f} EUR")
     c[1].metric("Conversion value", f"{kpi.conv_value.sum():,.0f} EUR")
-    c[2].metric("ROAS", f"{kpi.conv_value.sum() / kpi.cost.sum():.2f}")
+    c[2].metric("ROAS", f"{ratio(kpi.conv_value.sum(), kpi.cost.sum()):.2f}")
     c[3].metric("Wasted spend flagged", f"{waste.wasted_cost.sum():,.0f} EUR",
-                f"{waste.wasted_cost.sum() / kpi.cost.sum():.1%} of spend", delta_color="off")
+                f"{pct(ratio(waste.wasted_cost.sum(), kpi.cost.sum()), '.1%')} of spend", delta_color="off")
     st.dataframe(kpi, hide_index=True, width="stretch")
     l, r = st.columns(2)
     l.plotly_chart(charts.rolling_roas(query("02_daily_rolling_trends", db)), width="stretch")
@@ -117,7 +131,8 @@ with tab_ab:
         b = se.bayesian_ab_test(int(x_a), int(n_a), int(x_b), int(n_b))
         srm = se.srm_check(int(n_a), int(n_b))
         m = st.columns(5)
-        m[0].metric("Relative lift", f"{z.rel_lift:+.2%}")
+        m[0].metric("Relative lift", pct(z.rel_lift),
+                    None if np.isfinite(z.rel_lift) else "A has 0 conversions", delta_color="off")
         m[1].metric("p-value", f"{z.p_value:.4f}", "significant" if z.significant else "not significant",
                     delta_color="normal" if z.significant else "off")
         m[2].metric(f"{1 - alpha:.0%} CI (abs. diff)", f"[{z.ci_low:+.4f}, {z.ci_high:+.4f}]")
@@ -134,9 +149,12 @@ with tab_ab:
     base = c[0].number_input("Baseline rate", 0.001, 0.9, 0.04, 0.005, format="%.3f")
     mde = c[1].number_input("Minimum detectable effect (relative)", 0.01, 2.0, 0.10, 0.01)
     power = c[2].slider("Power", 0.5, 0.99, 0.80, 0.01)
-    n_req = se.required_sample_size(base, mde, alpha=alpha, power=power)
-    st.info(f"**{n_req:,} visitors per arm** ({2 * n_req:,} total) to detect {base:.2%} -> "
-            f"{base * (1 + mde):.2%} with alpha={alpha}, power={power:.0%}.")
+    if base * (1 + mde) >= 1:
+        st.error(f"Baseline x (1 + MDE) = {base * (1 + mde):.0%}: the target rate must stay below 100%.")
+    else:
+        n_req = se.required_sample_size(base, mde, alpha=alpha, power=power)
+        st.info(f"**{n_req:,} visitors per arm** ({2 * n_req:,} total) to detect {base:.2%} -> "
+                f"{base * (1 + mde):.2%} with alpha={alpha}, power={power:.0%}.")
 
 # --------------------------------------------------------------------- bandit
 with tab_bandit:
@@ -148,9 +166,10 @@ with tab_bandit:
     value = c[3].number_input("Value per conversion (EUR)", 1.0, 10_000.0, 60.0)
     try:
         rates = tuple(float(x) for x in rates_txt.split(","))
-        assert len(rates) >= 2 and all(0 < p < 1 for p in rates)
-    except (ValueError, AssertionError):
-        st.error("Enter at least two comma-separated rates between 0 and 1.")
+        if not (2 <= len(rates) <= 10 and all(0 < p < 1 for p in rates)):
+            raise ValueError
+    except ValueError:  # (not assert: asserts vanish under python -O)
+        st.error("Enter 2 to 10 comma-separated rates between 0 and 1.")
     else:
         res = bandits(rates, rounds, sims, value)
         st.dataframe(pd.DataFrame(se.bandit_summary(res)), hide_index=True, width="stretch")

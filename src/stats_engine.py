@@ -24,7 +24,7 @@ from dataclasses import asdict, dataclass
 
 import numpy as np
 from scipy import stats
-from scipy.special import betaln
+from scipy.special import betaln, logsumexp
 
 # --------------------------------------------------------------------------- #
 # Frequentist
@@ -149,6 +149,8 @@ def power_two_proportions(
     se0 = np.sqrt(p_bar * (1 - p_bar) * (1 / n_a + 1 / n_b))
     se1 = np.sqrt(p1 * (1 - p1) / n_a + p2 * (1 - p2) / n_b)
     za = _z(alpha, two_sided)
+    if se1 == 0:  # both rates are 0 or 1: no sampling noise, the outcome is deterministic
+        return float(p1 != p2)
     return float(stats.norm.cdf((abs(p2 - p1) - za * se0) / se1))
 
 
@@ -183,24 +185,38 @@ def prob_b_beats_a(
         P = sum_{i=0}^{b_alpha-1}  B(a_alpha + i, a_beta + b_beta)
                                   / ((b_beta + i) B(1 + i, b_beta) B(a_alpha, a_beta))
 
+    The sum has b_alpha terms, so when a_alpha is a smaller integer the
+    complement 1 - P(p_A > p_B) is used instead (ties have probability 0).
+    The terms are summed with log-sum-exp, so tiny terms do not underflow.
+
     Falls back to Monte Carlo for non-integer parameters or method="mc".
     """
-    integer = float(b_alpha).is_integer()
-    if method == "exact" or (method == "auto" and integer and b_alpha <= 50_000):
-        if not integer:
-            raise ValueError("exact method needs an integer b_alpha")
-        i = np.arange(int(b_alpha))
-        log_terms = (
-            betaln(a_alpha + i, a_beta + b_beta)
-            - np.log(b_beta + i)
-            - betaln(1 + i, b_beta)
-            - betaln(a_alpha, a_beta)
-        )
-        return float(np.clip(np.exp(log_terms).sum(), 0.0, 1.0))
+    if min(a_alpha, a_beta, b_alpha, b_beta) <= 0:
+        raise ValueError("Beta parameters must be positive")
+    b_int, a_int = float(b_alpha).is_integer(), float(a_alpha).is_integer()
+    if method == "exact" and not b_int:
+        raise ValueError("exact method needs an integer b_alpha")
+    if method in ("exact", "auto") and b_int and (method == "exact" or b_alpha <= 50_000):
+        if method == "auto" and a_int and a_alpha < b_alpha:
+            return 1.0 - _prob_b_beats_a_exact(b_alpha, b_beta, a_alpha, a_beta)
+        return _prob_b_beats_a_exact(a_alpha, a_beta, b_alpha, b_beta)
+    if method == "auto" and a_int and a_alpha <= 50_000:
+        return 1.0 - _prob_b_beats_a_exact(b_alpha, b_beta, a_alpha, a_beta)
     rng = np.random.default_rng(seed)
     pa = rng.beta(a_alpha, a_beta, draws)
     pb = rng.beta(b_alpha, b_beta, draws)
     return float((pb > pa).mean())
+
+
+def _prob_b_beats_a_exact(a_alpha: float, a_beta: float, b_alpha: float, b_beta: float) -> float:
+    i = np.arange(int(b_alpha))
+    log_terms = (
+        betaln(a_alpha + i, a_beta + b_beta)
+        - np.log(b_beta + i)
+        - betaln(1 + i, b_beta)
+        - betaln(a_alpha, a_beta)
+    )
+    return float(np.clip(np.exp(logsumexp(log_terms)), 0.0, 1.0))
 
 
 @dataclass(frozen=True)
@@ -214,8 +230,9 @@ class BayesResult:
     prob_b_beats_a: float
     expected_loss_choose_b: float  # E[max(p_a - p_b, 0)]  (risk of shipping B)
     expected_loss_choose_a: float
-    rel_lift_mean: float
+    rel_lift_mean: float  # heavy-tailed when A has few conversions: prefer the median
     rel_lift_ci: tuple[float, float]
+    rel_lift_median: float = float("nan")
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -228,14 +245,23 @@ def bayesian_ab_test(
 ) -> BayesResult:
     """Beta-Binomial A/B test (CTR or CVR). Uniform Beta(1,1) prior by default;
     pass an informative prior (e.g. from historical campaign data) to stabilise
-    low-traffic tests."""
+    low-traffic tests.
+
+    The relative lift p_B / p_A - 1 is a ratio of Beta draws: with few
+    conversions in A its mean is dominated by draws of p_A close to 0 (0/100 vs
+    5/100 gives a mean lift of about +17000%). ``rel_lift_median`` and
+    ``rel_lift_ci`` are the robust summaries to report."""
+    if min(trials_a, trials_b) < 0 or not (0 <= successes_a <= trials_a and 0 <= successes_b <= trials_b):
+        raise ValueError("successes must be within [0, trials]")
     a = beta_posterior(successes_a, trials_a, *prior)
     b = beta_posterior(successes_b, trials_b, *prior)
     rng = np.random.default_rng(seed)
     pa = rng.beta(*a, draws)
     pb = rng.beta(*b, draws)
     q = ((1 - credible) / 2, 1 - (1 - credible) / 2)
-    lift = (pb - pa) / pa
+    # rng.beta can return exactly 0.0 for small shape parameters (weak priors):
+    # floor at the smallest positive double so the lift stays finite
+    lift = (pb - pa) / np.maximum(pa, np.finfo(float).tiny)
     return BayesResult(
         posterior_a=a,
         posterior_b=b,
@@ -247,7 +273,8 @@ def bayesian_ab_test(
         expected_loss_choose_b=float(np.maximum(pa - pb, 0).mean()),
         expected_loss_choose_a=float(np.maximum(pb - pa, 0).mean()),
         rel_lift_mean=float(lift.mean()),
-        rel_lift_ci=tuple(np.quantile(lift, q)),
+        rel_lift_ci=tuple(float(x) for x in np.quantile(lift, q)),
+        rel_lift_median=float(np.median(lift)),
     )
 
 
@@ -307,6 +334,10 @@ def simulate_bandits(
     """
     p = np.asarray(true_rates, dtype=float)
     n_arms = len(p)
+    if n_arms < 1 or n_rounds < 1 or n_sims < 1:
+        raise ValueError("need at least one arm, one round and one replication")
+    if not np.all((p >= 0) & (p <= 1)):
+        raise ValueError("true_rates must be probabilities in [0, 1]")
     best = p.max()
     out: dict[str, BanditResult] = {}
     for name in policies:
@@ -314,8 +345,10 @@ def simulate_bandits(
         rng = np.random.default_rng(seed)  # same seed -> common random numbers
         s = np.zeros((n_sims, n_arms))
         f = np.zeros((n_sims, n_arms))
-        regret = np.zeros((n_sims, n_rounds))
-        reward = np.zeros((n_sims, n_rounds))
+        # Memory: one float64 matrix (regret, cumulated in place) + one bool
+        # matrix; 200 sims x 50k rounds = 80 MB + 10 MB instead of ~400 MB.
+        regret = np.empty((n_sims, n_rounds))
+        reward = np.empty((n_sims, n_rounds), dtype=bool)
         rows = np.arange(n_sims)
         for t in range(n_rounds):
             arm = choose(t, s, f, rng, n_sims, n_arms)
@@ -324,16 +357,19 @@ def simulate_bandits(
             f[rows, arm] += ~r
             regret[:, t] = best - p[arm]
             reward[:, t] = r
-        cum_regret = regret.cumsum(axis=1)
-        cum_reward = reward.cumsum(axis=1)
+        cum_regret = np.cumsum(regret, axis=1, out=regret)
+        conversions = reward.sum(axis=1)
+        mean_cum_reward = reward.mean(axis=0).cumsum()
+        del reward
         pulls = s + f
-        revenue = cum_reward[:, -1] * value_per_conversion
+        revenue = conversions * value_per_conversion
+        p05, p95 = np.quantile(cum_regret, [0.05, 0.95], axis=0)
         out[name] = BanditResult(
             policy=name,
             cumulative_regret=cum_regret.mean(axis=0),
-            regret_p05=np.quantile(cum_regret, 0.05, axis=0),
-            regret_p95=np.quantile(cum_regret, 0.95, axis=0),
-            cumulative_reward=cum_reward.mean(axis=0),
+            regret_p05=p05,
+            regret_p95=p95,
+            cumulative_reward=mean_cum_reward,
             total_revenue=float(revenue.mean()),
             total_revenue_sd=float(revenue.std(ddof=1)) if n_sims > 1 else 0.0,
             arm_share=(pulls / pulls.sum(axis=1, keepdims=True)).mean(axis=0),

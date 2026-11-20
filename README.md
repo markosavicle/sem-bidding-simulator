@@ -16,7 +16,7 @@ sem-bidding-simulator/
 │   ├── report.py              self-contained HTML report (no Streamlit needed)
 │   └── charts.py              Plotly figures shared by app and report
 ├── sql/                       7 commented analytical queries (CTEs + window functions)
-├── tests/                     56 pytest tests (statistics, SQL parity, simulator, app)
+├── tests/                     87 pytest tests (statistics, edge cases, SQL parity, simulator, app)
 ├── outputs/                   summary.json, report.html, query results (sample run)
 └── requirements.txt
 ```
@@ -29,7 +29,7 @@ pip install -r requirements.txt
 
 python -m src.data_generator --sqlite data/sem.sqlite    # ~3 s: 406k hourly rows -> DuckDB (+ SQLite copy)
 python -m src.pipeline --report outputs/report.html      # ~8 s: every module, writes outputs/
-python -m pytest                                         # 56 tests, ~10 s
+python -m pytest                                         # 87 tests, ~10 s
 streamlit run app.py                                     # interactive dashboard
 ```
 
@@ -195,7 +195,7 @@ UCB1's exploration bonus $\sqrt{2\ln t/n}$ is calibrated for rewards in [0, 1]. 
 | EV bidding + shrinkage | keyword bids from value, not gut feel | higher ROAS at the same or lower spend; stable bids for long-tail keywords |
 | Bid landscape | "what if we bid X?" | estimate headroom before you spend it |
 
-## 7. Tests (`tests/`, 56 tests)
+## 7. Tests (`tests/`, 87 tests)
 
 * **Statistics:** z² equals χ² (scipy), the textbook sample size (10 % → 12 % ⇒ 3,841/arm), power at the computed n is 0.80, simulated **CI coverage ≈ 95 %**, **type-I error ≈ 5 %** and **empirical power ≈ 80 %**, the exact P(B > A) matches Monte Carlo, symmetry, and expected loss.
 * **Bandits:** static-split regret equals the exact linear formula, Thompson beats static and UCB1, UCB1 regret is sublinear, and the regret bands are ordered.
@@ -203,6 +203,7 @@ UCB1's exploration bonus $\sqrt{2\ln t/n}$ is calibrated for rewards in [0, 1]. 
 * **SQL:** every query returns identical results on DuckDB and SQLite, matches pandas, and computes rolling ratios of sums and wasted-spend rules correctly.
 * **Bidding:** the prior fit recovers the simulated population, shrinkage pulls low-volume keywords harder, the EV formula and rule actions are exact, the landscape fit recovers the curve, and EV beats rules in the forward simulation.
 * **App:** the end-to-end pipeline, the HTML report, and the Streamlit app rendered headless via `streamlit.testing`.
+* **Edge cases:** 0 conversions or 100 % rates emit no divide-by-zero warnings, the exact P(B > A) stays exact (via the complement) for > 50k conversions and does not underflow, the lift median stays robust when the control has 0 conversions, Beta priors near 0 stay finite, bandits validate their inputs, `load_sql` only accepts the bundled queries (no path traversal), SQLite connections are read-only, and the Streamlit app shows messages instead of crashing on impossible inputs.
 
 ## 8. Limitations and next steps
 
